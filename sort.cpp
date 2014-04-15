@@ -10,28 +10,72 @@
 #include <fstream>
 
 /*http://edu.i-lo.tarnow.pl/inf/alg/003_sort/0024.php  -  sortowanie pozycyjne */
-
+/*http://www.algorytm.edu.pl/algorytmy-maturalne/sortowanie-przez-scalanie.html   scalanie*/
 using namespace std;
+
+
+template <typename T>
+class Sortowanie{
+public:
+  std::vector < int > V;
+  int ilosc_elementow;
+
+
+  /* Sortowania();
+  Sortowania(int p);
+  ~Sortowania();*/
+
+  void Sortowanie_Babelkowe(int n);
+  void Sortowanie_Szybkie(int x, int y);
+  void SortOdwr(int pierwszy, int ostatni);
+  void Sortowanie_Scalanie(int pierwszy1, int ostatni2);
+
+  int CzyPosortowana(int kierunek);
+  void Wyswietl_Vector();
+  void Zapelnij_Vector(int ilosc_elementow);
+};
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
 /*!
  * \brief Funkcja zapelniajaca tablice losowymi liczbami, ktorych ilosc jest zadana na wejsciu
  */
 template <typename T>
-void Zapelnij_Vector(std::vector<T> & V, const int ilosc_elementow){
+void Sortowanie<T>::Zapelnij_Vector(int ilosc_elementow){
   srand(time(NULL));
   for( int i=1; i<=ilosc_elementow; i++)
-    V.push_back(rand()% 100 + 1);
+    V.push_back(rand());
 }
 template <typename T>
-void Wyswietl_Vector(std::vector<T> & V){
+void Sortowanie<T>::Wyswietl_Vector(){
   for(unsigned int i=0; i<V.size(); i++)
     cout << V[i] << endl;
 }
 
 template <typename T>
-void Sortowanie_Babelkowe(std::vector<T> & V, int n) {
-  bool swapped; // Czy zamieniono w ostatnim obrocie?
+int Sortowanie<T>::CzyPosortowana(int kierunek)
+{
+  int licznik=0;
+  int rozmiar=V.size();
+  int a, i=0;
+  a=V[i];
+  if(kierunek==1){
+    for(i;i<rozmiar-1;i++){
+      a=V[i];
+      licznik++;
+      if (V[i+1]<a) return false;
+    }}
+  if(kierunek==0){
+    for(i;i<rozmiar-1;i++){
+      a=V[i];
+      if (V[i+1]>a) return false;
+    }}
+  return licznik;
+}
 
+template <typename T>
+void Sortowanie<T>::Sortowanie_Babelkowe(int n) {
+  bool swapped; // Czy zamieniono w ostatnim obrocie?
   do {
     swapped = false;
     for (int i = 0; i < n - 1; ++i) {
@@ -44,14 +88,19 @@ void Sortowanie_Babelkowe(std::vector<T> & V, int n) {
 }
 
 
-
 template <typename T>
-void Sortowanie_Szybkie(std::vector<T> & V, int x, int y)
+void Sortowanie<T>::Sortowanie_Szybkie(int x, int y)
 {
   long i, j, mid;
   i=x;
   j=y;
-  mid=V[(x+y)/2];
+  int a1 = V[x];
+  int a2 = V[x+1];
+  int a3 = V[x+2];
+  if((a1<=a2&&a2<=a3)||(a3<=a2&&a2<=a1)) mid = a2;
+  if((a2<=a1&&a1<=a3)||(a3<=a1&&a1<=a2)) mid = a1;
+  if((a2<=a3&&a3<=a1)||(a1<=a3&&a3<=a2)) mid = a3;
+  //mid=V[(x+y)/2];
   do
     {
       while(V[i]<mid)
@@ -66,110 +115,107 @@ void Sortowanie_Szybkie(std::vector<T> & V, int x, int y)
         }
     }
   while(i<=j);
-  if(x<j) Sortowanie_Szybkie(V, x, j);
-  if(i<y) Sortowanie_Szybkie(V, i, y);
+  if(x<j) Sortowanie_Szybkie(x, j);
+  if(i<y) Sortowanie_Szybkie(i, y);
 }
 
 
 template <typename T>
-void Sortowanie_Scalanie(std::vector<T> & V, int pocz, int kon)
+void Sortowanie<T>::Sortowanie_Scalanie(int pierwszy1, int ostatni2)
 {
-  long i, j, k, srodek;
-      std::vector < int > wektor2;
-    srodek=(pocz+kon+1)/2;
-    if(srodek-pocz > 1)
-        Sortowanie_Scalanie(V, pocz, srodek-1);
-    if(kon-srodek > 0)
-        Sortowanie_Scalanie(V, srodek, kon);
-    j=pocz;
-    k=srodek;
-    for(i=pocz; i<=kon; i++)
-        wektor2[i]=(j==srodek || (k<=kon && V[j]>V[k])) ? V[k++] : V[j++];
-    for(i=pocz; i<=kon; i++)
-        V[i]=wektor2[i];
-    //~wektor2();
+  int i2, i1=pierwszy1;
+  int i=pierwszy1;
+  T *Tpom=new int[V.size()];
+  int pierwszy2=(pierwszy1+ostatni2+1)/2;
+  i2=pierwszy2;
+  if(pierwszy2-pierwszy1>1) Sortowanie_Scalanie(pierwszy1,pierwszy2-1);
+  if(ostatni2-pierwszy2>0) Sortowanie_Scalanie(pierwszy2,ostatni2);
+
+  for(i=pierwszy1;i<=ostatni2;i++){
+    if((i1==pierwszy2)||((i2<=ostatni2)&&(V[i1]>V[i2]))){
+      Tpom[i]=V[i2];
+      i2+=1;}
+    else{
+      Tpom[i]=V[i1];
+      i1+=1;}}
+  for(i=pierwszy1;i<=ostatni2;i++)
+    V[i]=Tpom[i];
+  delete Tpom; Tpom=NULL;
 }
 
 
 
 
+template <typename T>
+void Sortowanie<T>::SortOdwr(int pierwszy, int ostatni)
+{
+  int piwot, p, a;
+  int i=((pierwszy+ostatni)/2);   //indeks wartosc piwota
 
-/*
-RadixSort{ 		
-	 for k := 1 to d do 		
-	      for j := 1 to n do 		
-	             x := k-ta cyfra od końca liczby e[j]; 		//  rozrzuć wszystkie liczby do kubełków
-	           włóż e[j] do kolejki q[x]; 		 //o numerach 0,...9 ze względu na k-tą od końca cyfrę
-	       od; 		 
-	      for j := 0  to 9 do             		//połącz kolejki w jeden ciąg
-	      przepisz zawartość kolejki q[j]
-      na kolejne pozycje tablicy e ;     		//z zachowaniem kolejności elementów w kolejkach
-	     od; 		
-	 od;        		               
-     } 	 
-*/
+  piwot=V[i];
+
+    p=a=ostatni;
+    swap(V[i],V[pierwszy]);
+    for(a=ostatni;a>pierwszy;a--){      // POROWNYWANIE Z PIWOTEM
+      if(piwot>(V[a])){
+	swap(V[p],V[a]);
+	p-=1;
+      }}                                // DO TEGO MOMENTU
+    swap(V[p],V[pierwszy]); //Koncowa zmiana piwota z elementem p
+  
+
+  if(pierwszy<p-1) SortOdwr(pierwszy,p-1); //sortowanie pierwszej polowy
+  if(p+1<ostatni) SortOdwr(p+1,ostatni);   //sortowanie drugiej polowy
+}
 
 
 
-
-
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
 int main(){ 
   cout << "##################"<< endl;
 
-std::vector < int > wektor;
+  Sortowanie<int> *S=new Sortowanie<int>;
 
-  double difference; 
+  double difference;
   timeval start, stop;
-  int ilosc_powtorzen;
-  int ilosc_elementow;
+  int licznik=0;
+  //cout << "Ile elementow ma miec wektor?" << endl;
+  //cout << "-> ";
+  //cin >> S->ilosc_elementow;
+  //cout << endl;
+  int tab[5]={4096, 16384, 65536, 262144, 1048576};
+  //int tab[5]={4, 16, 65, 262, 1048};
 
-  cout << "Ile razy ma powtorzyc algorytm?" << endl;
-  cout << "-> ";
-  cin >> ilosc_powtorzen;
-  cout << endl;
+  S->ilosc_elementow = tab[1];
+ 
 
-  cout << "Ile elementow ma miec wektor?" << endl;
-  cout << "-> ";
-  cin >> ilosc_elementow;
-  cout << endl;
-
-  gettimeofday(&start,NULL);
-
-  Zapelnij_Vector(wektor, ilosc_elementow);
-  // Wyswietl_Vector(wektor);
+  S->Zapelnij_Vector(S->ilosc_elementow);
+  int rozmiar = S->V.size();
+  //S->Sortowanie_Szybkie(0, rozmiar);
+  S->SortOdwr(0, rozmiar);
+  //S->Wyswietl_Vector();
   cout << "#################" << endl;
-  int rozmiar=wektor.size();
-  for(int i=0;i<ilosc_powtorzen;i++)
-    // Sortowanie_Babelkowe(wektor, rozmiar);
-    Sortowanie_Scalanie(wektor, 0, rozmiar);
-  //Sortowanie_Szybkie(wektor, 0, rozmiar);
-
-  //Wyswietl_Vector(wektor);
-
+  gettimeofday(&start,NULL);
+  S->Sortowanie_Babelkowe(rozmiar);
+  S->Sortowanie_Scalanie(0, rozmiar);
+  S->Sortowanie_Szybkie(0, rozmiar);
+  //S->Wyswietl_Vector();
   gettimeofday(&stop,NULL);
+  licznik = S->CzyPosortowana(1);
+  cout << licznik << endl;
   cout << "zakonczono prace" << endl;
 
   difference = (stop.tv_sec - start.tv_sec)*1000.0;
   difference += (stop.tv_usec - start.tv_usec) / 1000.0;
-  //difference = (end - start) / (double)CLOCKS_PER_SEC;
-  cout << "czas pracy programu: " << difference << "ms" << endl;
-  cout << "##################"<< endl;
+  //difference = (end - start) / (double)CLOCKS_PER_SEC;  
 
-  /*
-    fstream plik1;
-    plik1.open("csv.txt");   //otwarcie pliku zrodlowego
-    if ( !plik1.is_open() ) {
-    cerr << "Blad otwarcia pliku do zapisu wynikow koncowych" << endl;
-    }
-    else{
-    // plik1 << "ilosc elementow" <<"  "<< "ilosc powtorzen" <<"  "<< "czas pracy [ms]" << endl;
-    plik1 << ilosc_elementow <<"                 "<< ilosc_powtorzen <<"                 "<< difference << endl;
-    }
-  */
-
-  cout << "ilosc elementow" <<"  "<< "ilosc powtorzen" <<"  "<< "czas pracy [ms]" << endl;
-  cout << ilosc_elementow <<"                 "<< ilosc_powtorzen <<"                 "<< difference << endl;
+  cout << "ilosc elementow" <<"  "<< "czas pracy [ms]" << endl;
+  cout << S->ilosc_elementow <<"                 "<< difference << endl;
   cout << "##################"<< endl;
+  /////////////////////////////////////////////////////////////////////////////////////
+ 
   return 0;
 }
